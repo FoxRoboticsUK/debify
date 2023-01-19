@@ -38,7 +38,7 @@ fi
 aptly publish repo \
     -batch \
     -architectures="$APTLY_ARCHITECTURES" \
-    -passphrase="jayceelock" \
+    -passphrase="$passphrase" \
     -config="/aptly/aptly.conf" \
     $APTLY_REPO_NAME
 echo "Repo published"
