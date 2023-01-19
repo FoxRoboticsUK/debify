@@ -10,9 +10,9 @@ Run the Debify image, mounting two volumes to special mount points:
 
 1. `/.gnpug`: Mount your GPG directory containing the key you want to sign the repository with here.
 
-2. `/debs`: Mount a directory containing all your Debian packages here.
+2. `/aptly/debs`: Mount a directory containing all your Debian packages here.
 
-A tarball of the resulting Debian repository will be written to `/debs/repo.tar.gz`.
+A tarball of the resulting Debian repository will be written to `/aptly/debs/repo.tar.gz`.
 
 If you specify `URI` and `KEYSERVER` enviornment variables, the tarball will also contain a `go`
 script for setting up the repository.
@@ -26,7 +26,7 @@ http://example.com/apt:
     $ docker run -e URI=http://example.com/apt \
                  -e KEYSERVER=keyserver.ubuntu.com \
                  -v ~/.gnupg:/.gnupg \
-                 -v ~/my-debs:/debs \
+                 -v ~/my-debs:/aptly/debs \
                  spotify/debify
 
 Serving
