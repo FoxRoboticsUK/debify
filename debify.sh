@@ -1,22 +1,10 @@
 #!/bin/bash
 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 set -e
 
-if [ ! -d /debs ]
+if [ ! -d /aptly/debs ]
 then
-    echo "Mount your Debian package directory to /debs."
+    echo "Mount your Debian package directory to /aptly/debs."
     exit 1
 fi
 
@@ -25,11 +13,19 @@ APTLY_REPO_NAME=debify
 aptly repo create \
     -component="$APTLY_COMPONENT" \
     -distribution="$APTLY_DISTRIBUTION" \
+    -config="/aptly/aptly.conf" \
     $APTLY_REPO_NAME
+echo "Repo created"
 
-aptly repo add $APTLY_REPO_NAME /debs/
+aptly repo add \
+    -config="/aptly/aptly.conf" \
+    $APTLY_REPO_NAME \
+    /aptly/debs/
+echo "Debs added to repo"
 
-aptly repo show $APTLY_REPO_NAME
+aptly repo show \
+    -config="/aptly/aptly.conf" \
+    $APTLY_REPO_NAME 
 
 if [ ! -z "$GPG_PASSPHRASE" ]
 then
@@ -40,11 +36,14 @@ then
 fi
 
 aptly publish repo \
+    -batch \
     -architectures="$APTLY_ARCHITECTURES" \
-    -passphrase="$passphrase" \
+    -passphrase="jayceelock" \
+    -config="/aptly/aptly.conf" \
     $APTLY_REPO_NAME
+echo "Repo published"
 
-mv ~/.aptly/public /repo
+mv /aptly/repo/public /repo
 
 if [ ! -z "$KEYSERVER" ] && [ ! -z "$URI" ]
 then
@@ -67,9 +66,13 @@ END
     cat >> /repo/go <<-END
 apt-key adv --keyserver $KEYSERVER --recv-keys $gpg_key_id
 echo "deb $URI $APTLY_DISTRIBUTION $APTLY_COMPONENT" >> /etc/apt/sources.list
-
 apt-get update
 END
 fi
 
-tar -C /repo -czf /debs/repo.tar.gz .
+tar -C /repo -czf /aptly/debs/repo.tar.gz .
+echo "Repo published as tarball"
+
+aptly serve \
+    -listen=:5559 \
+    -config="/aptly/aptly.conf"
