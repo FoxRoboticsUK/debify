@@ -14,6 +14,8 @@ Run the Debify image, mounting two volumes to special mount points:
 
 3. `$GPG_PASSPHRASE(_FILE)`: Set these environment variables to the raw string of file containing the GPG passphrase needed for the server's private key.
 
+4. `$PORT`: Set the port where the packages will be served (defaults to port 80). 
+
 A tarball of the resulting Debian repository will be written to `/aptly/debs/repo.tar.gz`.
 
 If you specify `URI` and `KEYSERVER` enviornment variables, the tarball will also contain a `go`

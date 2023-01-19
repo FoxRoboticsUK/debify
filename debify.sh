@@ -74,5 +74,5 @@ tar -C /repo -czf /aptly/debs/repo.tar.gz .
 echo "Repo published as tarball"
 
 aptly serve \
-    -listen=:5559 \
+    -listen=:$PORT \
     -config="/aptly/aptly.conf"
